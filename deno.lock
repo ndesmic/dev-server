@@ -1,5 +1,9 @@
 {
-  "version": "2",
+  "version": "3",
+  "redirects": {
+    "https://deno.land/std/media_types/mod.ts": "https://deno.land/std@0.178.0/media_types/mod.ts",
+    "https://deno.land/std/path/mod.ts": "https://deno.land/std@0.74.0/path/mod.ts"
+  },
   "remote": {
     "https://deno.land/std@0.178.0/media_types/_db.ts": "7606d83e31f23ce1a7968cbaee852810c2cf477903a095696cdc62eaab7ce570",
     "https://deno.land/std@0.178.0/media_types/_util.ts": "916efbd30b6148a716f110e67a4db29d6949bf4048997b754415dd7e42c52378",

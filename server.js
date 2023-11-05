@@ -4,10 +4,34 @@ import { probeStat } from "./utils/fs-utils.js";
 
 const baseDir = "./routes";
 
+//hmr
+const hmrNotifyUrl = "/_hmr";
+const hmrPaths = ["./routes/js/", "./routes/css/"];
+
+const textEncoder = new TextEncoder();
 Deno.serve(async req => {
 	const url = new URL(req.url);
 	let inputPath = url.pathname;
 	const filePaths = [];
+
+
+	//hmr route
+	if(inputPath === hmrNotifyUrl){
+		const watcher = Deno.watchFs(hmrPaths);
+		const hmrReadStream = new ReadableStream({
+			async start(controller) {
+				for await (const event of watcher) {
+					if (event.kind !== "modify") continue;
+					controller.enqueue(textEncoder.encode(`id: ${new Date().getTime()}\nevent: hmr\ndata: ${event.paths[0]}\n\n`));
+				}
+			}
+		});
+		return new Response(hmrReadStream, {
+			headers: {
+				"Content-Type": "text/event-stream"
+			}
+		});
+	}
 
 	//normalize path
 	if (inputPath.endsWith("/")) {
@@ -19,7 +43,7 @@ Deno.serve(async req => {
 		const path = baseDir + inputPath;
 		filePaths.push(path);
 	}
-
+	
 	//find
 	const fileMatch = await probeStat(filePaths);
 	if(!fileMatch){
@@ -59,3 +83,4 @@ Deno.serve(async req => {
 		}
 	}
 });
+
