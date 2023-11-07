@@ -54,7 +54,9 @@ Deno.serve(async req => {
 			const mod = await import("./responders/server-responder.js");
 				return mod.serverResponder(filePath, req);
 		}
+		case "react.js":
 		case "react.jsx":
+		case "react.ts":
 		case "react.tsx":
 		{
 			const mod = await import("./responders/react-responder.js");

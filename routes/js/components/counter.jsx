@@ -5,7 +5,7 @@ export function Counter() {
 
 	return <div>
 		<div className="counter">{value}</div>
-		<button onClick={() => setValue(value--)}>-</button>
-		<button onClick={() => setValue(value--)}>+</button>
+		<button onClick={() => setValue(value - 1)}>-</button>
+		<button onClick={() => setValue(value + 1)}>+</button>
 	</div>
 }
