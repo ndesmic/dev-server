@@ -14,7 +14,16 @@ Deno.serve(async req => {
 		inputPath += "index";
 	}
 	if(!inputPath.includes(".")){
-		filePaths.push(...[".html", ".server.js", ".server.ts", ".server.jsx", ".server.tsx"].map(ext => baseDir + inputPath + ext));
+		filePaths.push(...[
+			".html", 
+			".server.js", 
+			".server.ts", 
+			".server.jsx", 
+			".server.tsx", 
+			".react.js",
+			".react.jsx",
+			".react.tsx"
+		].map(ext => baseDir + inputPath + ext));
 	} else {
 		const path = baseDir + inputPath;
 		filePaths.push(path);
@@ -26,31 +35,36 @@ Deno.serve(async req => {
 		return new Response("Not Found", { status: 404 });
 	}
 
-	//read or execute
-	const ext = extname(fileMatch[1]);
+	const filePath = fileMatch[1];
+	const ext = filePath.split(".").filter(x => x).slice(1).join(".");
 
 	switch(ext){
-		case ".js": 
-		case ".ts":
-		case ".tsx":
-		case ".jsx": { 
-			if(/\.server\.(js|ts|jsx|tsx)/.test(fileMatch[1])){
-				const mod = await import(fileMatch[1]);
-				if(req.method === "GET"){
-					return mod.get?.(req) ?? mod.default?.(req)
-						?? new Response("Method not allowed", { status: 405 });
-				} else if (req.method === "DELETE"){
-					return mod.del?.(req)
-						?? new Response("Method not allowed", { status: 405 });
-				} else {
-					return mod[req.method.toLowerCase()]?.(req) 
-						?? new Response("Method not allowed", { status: 405 });
-				}
-			}
+		case "jsx":
+		case "ts":
+		case "tsx":
+		{
+			const mod = await import("./responders/transpile-responder.js");
+				return mod.transpileResponder(filePath);
+		}
+		case "server.js": 
+		case "server.ts":
+		case "server.jsx":
+		case "server.tsx":
+		{ 
+			const mod = await import("./responders/server-responder.js");
+				return mod.serverResponder(filePath, req);
+		}
+		case "react.js":
+		case "react.jsx":
+		case "react.ts":
+		case "react.tsx":
+		{
+			const mod = await import("./responders/react-responder.js");
+				return mod.reactResponder(filePath);
 		}
 		// falls through
 		default: {
-			const file = await Deno.open(fileMatch[1]);
+			const file = await Deno.open(filePath);
 			return new Response(file.readable, {
 				headers: {
 					"Content-Type": typeByExtension(ext)
