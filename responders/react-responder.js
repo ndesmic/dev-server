@@ -3,7 +3,23 @@ import ReactDom from "npm:react-dom/server";
 import { Document } from "../layouts/document.jsx";
 import { resolve, toFileUrl } from "https://deno.land/std@0.205.0/path/mod.ts";
 
-export async function reactResponder(path){	
+const extensions = [
+	"react.js",
+	"react.jsx",
+	"react.ts",
+	"react.tsx",
+];
+
+export function match(path){
+	const ext = path.split(".").filter(x => x).slice(1).join(".");
+	return extensions.includes(ext);
+}
+
+export function defaultPaths(barePath){
+	return extensions.map(ext => barePath + "." + ext);
+}
+
+export default async function reactResponder(path){	
 	const moduleImportPath = toFileUrl(resolve(Deno.cwd(), path));
 	const mod = await import(moduleImportPath);
 	const props = await mod.getServerProps();
