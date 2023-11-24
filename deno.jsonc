@@ -1,5 +1,7 @@
 {
 	"tasks": {
-		"start" : "deno run -A --unstable server.js"
+		"start" : "deno run -A --unstable server.js",
+		"static" : "deno run -A --unstable static.js",
+		"static-serve" : "file_server ./out"
 	}
 }

@@ -1,0 +1,14 @@
+<html>
+
+<body>
+	<h1>Fetch!</h1>
+	<script type="module">
+		const res = await fetch("/nested/hi.txt");
+		const div = document.createElement("div");
+		div.textContent = await res.text();
+		document.body.append(div);
+	</script>
+	
+</body>
+
+</html>

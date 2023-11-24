@@ -14,13 +14,15 @@ Deno.serve(async req => {
 	if (inputPath.endsWith("/")) {
 		inputPath += "index";
 	}
-	if(!inputPath.includes(".")){
-		potentialFilePaths.push(baseDir + inputPath + ".html");
-		potentialFilePaths.push(...responders.flatMap(responder => responder.defaultPaths(baseDir + inputPath)));
+	if(!inputPath.includes(".")){potentialFilePaths.push(baseDir + inputPath + ".html");
+		
 	} else {
+		//basic path
 		const path = baseDir + inputPath;
 		potentialFilePaths.push(path);
 	}
+
+	potentialFilePaths.push(...responders.flatMap(responder => responder.defaultPaths(baseDir + inputPath)));
 
 	//find
 	const fileMatch = await probeStat(potentialFilePaths);
@@ -28,8 +30,7 @@ Deno.serve(async req => {
 		return new Response("Not Found", { status: 404 });
 	}
 
-	const filePath = fileMatch[1];
-	const ext = filePath.split(".").filter(x => x).slice(1).join(".");
+	const filePath = fileMatch.path;
 
 	for(const responder of responders){
 		if(await responder.match(filePath)){
@@ -38,6 +39,7 @@ Deno.serve(async req => {
 	}
 
 	const file = await Deno.open(filePath);
+	const ext = filePath.split(".").filter(x => x).slice(1).join(".");
 	return new Response(file.readable, {
 		headers: {
 			"Content-Type": typeByExtension(ext)

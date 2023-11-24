@@ -1,4 +1,6 @@
-import { transform } from "https://deno.land/x/esbuild/mod.js";
+import { transform, stop } from "https://deno.land/x/esbuild/mod.js";
+
+export const name = "transpile";
 
 const extensions = [
 	"jsx",
@@ -21,7 +23,11 @@ export default async function transpileResponder(path) {
 
 	return new Response(transpiled.code, {
 		headers: {
-			"Content-Type": "text/javascript"
+			"Content-Type": "application/javascript"
 		}
 	});
+}
+
+export function dispose(){
+	stop();
 }
