@@ -54,13 +54,6 @@ for(const responder of responders){
 	responder.dispose?.();
 }
 
-//possible conflict if this exists...
-// Deno.writeTextFileSync(join(outDir, "importmap.json"), JSON.stringify({
-// 	imports: importMap
-// }, null, 4));
-// console.log("Wrote importmap.json");
-
-
 const htmlFiles = expandGlob(join(Deno.cwd(), outDir, "**/*html"));
 for await(const htmlFile of htmlFiles){
 	const content = Deno.readTextFileSync(htmlFile.path);
