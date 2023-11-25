@@ -10,6 +10,8 @@ const extensions = [
 	"react.tsx",
 ];
 
+export const name = "react";
+
 export function match(path){
 	const ext = path.split(".").filter(x => x).slice(1).join(".");
 	return extensions.includes(ext);
@@ -19,10 +21,19 @@ export function defaultPaths(barePath){
 	return extensions.map(ext => barePath + "." + ext);
 }
 
-export default async function reactResponder(path){	
+export default async function reactResponder(path, request){	
 	const moduleImportPath = toFileUrl(resolve(Deno.cwd(), path));
 	const mod = await import(moduleImportPath);
-	const props = await mod.getServerProps();
+
+	if (!request){
+		if(mod.getStaticRequest) {
+			request = await mod.getStaticRequest(path);
+		} else {
+			return new Response("No Request", { status: 405 });
+		}
+	}
+
+	const props = await mod.getServerProps(request);
 	const title = await mod.getTitle?.();
 	const [componentPath, exportName] = await mod.getRootComponent();
 

@@ -6,3 +6,9 @@ export default async function get(req) {
 		},
 	});
 }
+
+export function getStaticRequest(path) {
+	return new Request(path, {
+		method: "get"
+	});
+}
